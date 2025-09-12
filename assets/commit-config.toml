@@ -1,0 +1,28 @@
+[generator]
+# Claude CLI configuration for commit message generation
+command = "claude"
+# Claude CLI arguments
+args = ["--model", "sonnet", "--print"]
+# Fallback message if generation fails
+default_commit_message = "WARNING: commit message generation failure"
+
+[prompt]
+# A prompt template for generating commit messages that will be added after the args above
+# Variables: {language}, {commit type}, {diff_content}
+template = """
+Generate a Git commit message in {language}, following the Conventional Commits format. Output ONLY the commit title and body, no explanations or extra text.
+
+Format:
+{commit type}: {concise commit title in {language}}
+
+{explanation WHY we made the changes, in bullet list}
+
+Requirements:
+- Use appropriate commit type: build, chore, ci, docs, style, refactor, perf, test
+- Title: 50 characters or less
+- Body: 70 characters per line maximum
+- Language: {language}
+
+Diff:
+{diff_content}
+"""

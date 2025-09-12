@@ -1,0 +1,20 @@
+[package]
+name = "c"
+version = "0.1.0"
+edition = "2024"
+description = "A Claude Code hook that automatically creates a commit whenever changes are made. You can also use this as a standalone commit message generator from git diffs."
+
+[dependencies]
+anyhow = "1.0.99"
+clap = { version = "4.5.47", features = ["derive", "env"] }
+git2 = "0.20.2"
+jiff = "0.2.15"
+regex = "1.11.2"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.143"
+toml = "0.9.5"
+
+[profile.dev]
+lto = true
+codegen-units = 1
+panic = "abort"
