@@ -4,11 +4,9 @@ A [Claude Code](https://docs.anthropic.com/en/docs/claude-code/) hook that autom
 
 ## Features
 
-- Works as both [Claude Code hook](https://docs.anthropic.com/en/docs/claude-code/hooks) and standalone commit message generator
-- Stages a modified file when used as a hook
-- Uses Claude Code to generate a commit message, with the conventional commit format
-- No `git` subprocess overhead
-- Creates session branches if on `main` branch
+- Commits on session end (`/clear` and `/compact`) or after each edit (`Edit`, `MultiEdit`, and/or `Write`)
+- Generates commit messages using Claude Code
+- Creates session branches when starting from `main`, `master`, or `develop` branches
 
 ## Installation
 
@@ -20,19 +18,16 @@ cargo install --path .
 
 ### As Claude Code Hook
 
-1. `SessionStart`: Creates a new branch `claude-session-{yyyy-mm-dd_hh-mm-ss}-{session_id}`
-   - A session branch is only created when starting from the `main` branch. If you are already on a session branch or another branch, no new branch will be created.
-   - Manual branch switching and merging when desired
-2. `PostToolUse`: Stages the modified file and creates a commit automatically
-
-See [Hooks reference](https://docs.anthropic.com/en/docs/claude-code/hooks) for details.
-
-Claude Code hooks are configured in your [settings files](https://docs.anthropic.com/en/docs/claude-code/settings):
+Configure hooks in your [settings files](https://docs.anthropic.com/en/docs/claude-code/settings). You can use either strategy independently or combine both:
 
 - `~/.claude/settings.json` - User settings
 - `.claude/settings.json` - Project settings
 - `.claude/settings.local.json` - Local project settings (not committed)
 - Enterprise managed policy settings
+
+#### Session-based commits
+
+Creates one commit per session when you use `/clear` or `/compact`. Also creates session branches when starting from `main`, `master`, or `develop`:
 
 ```json
 {
@@ -47,7 +42,18 @@ Claude Code hooks are configured in your [settings files](https://docs.anthropic
           }
         ]
       }
-    ],
+    ]
+  }
+}
+```
+
+#### Per-edit commits
+
+Creates a commit for each edit operation immediately:
+
+```json
+{
+  "hooks": {
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
@@ -64,6 +70,11 @@ Claude Code hooks are configured in your [settings files](https://docs.anthropic
 }
 ```
 
+See [Hooks reference](https://docs.anthropic.com/en/docs/claude-code/hooks) for details.
+
+> [!NOTE]
+> Despite being documented in the [official Claude Code hooks documentation](https://docs.anthropic.com/en/docs/claude-code/hooks#sessionend), `SessionEnd` events are never actually sent in practice, as of Claude Code version 1.0.113. This tool works around this limitation by detecting `SessionStart` events with `source: "clear"` or `source: "compact"`, which are sent when users end sessions with `/clear` or `/compact` commands.
+
 ### As Standalone Commit Message Generator
 
 1. Reads diff content from stdin
@@ -72,6 +83,8 @@ Claude Code hooks are configured in your [settings files](https://docs.anthropic
 
 ```bash
 git diff | c
+# or with staged changes
+git diff --staged | c
 ```
 
 ## Customization

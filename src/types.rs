@@ -24,13 +24,46 @@ impl Default for Repository {
 pub enum HookEvent {
     SessionStart {
         session_id: String,
+        #[allow(dead_code)] // for future use
+        transcript_path: String,
+        cwd: String,
+        #[serde(default)]
+        source: Option<SessionStartSource>,
     },
     PostToolUse {
+        #[allow(dead_code)] // for future use
+        session_id: String,
+        #[allow(dead_code)] // for future use
+        transcript_path: String,
         cwd: String,
         tool_name: ToolName,
         tool_input: ToolInput,
         tool_response: ToolResponse,
     },
+}
+
+impl HookEvent {
+    pub fn cwd(&self) -> &str {
+        match self {
+            HookEvent::SessionStart { cwd, .. } | HookEvent::PostToolUse { cwd, .. } => cwd,
+        }
+    }
+
+    #[allow(dead_code)] // for future use
+    pub fn session_id(&self) -> &str {
+        match self {
+            HookEvent::SessionStart { session_id, .. }
+            | HookEvent::PostToolUse { session_id, .. } => session_id,
+        }
+    }
+
+    #[allow(dead_code)] // for future use
+    pub fn transcript_path(&self) -> &str {
+        match self {
+            HookEvent::SessionStart { transcript_path, .. }
+            | HookEvent::PostToolUse { transcript_path, .. } => transcript_path,
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -46,6 +79,27 @@ pub struct ToolResponse {
 
 fn default_success() -> bool {
     true
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SessionStartSource {
+    Clear,
+    Compact,
+    Resume,
+    Startup,
+    #[serde(other)] // fallback
+    Unknown,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SessionEndReason {
+    Clear,
+    Logout,
+    PromptInputExit,
+    Exit,
+    Other,
 }
 
 #[derive(Debug, Deserialize)]

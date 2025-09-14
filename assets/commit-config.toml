@@ -10,7 +10,7 @@ default_commit_message = "WARNING: commit message generation failure"
 # A prompt template for generating commit messages that will be added after the args above
 # Variables: {language}, {commit type}, {diff_content}
 template = """
-Generate a Git commit message in {language}, following the Conventional Commits format. Output ONLY the commit title and body, no explanations or extra text.
+Generate a Git commit message in {language}, following the Conventional Commits format. OUTPUT ONLY THE COMMIT TITLE AND BODY, NO EXPLANATIONS OR EXTRA TEXT.
 
 Format:
 {commit type}: {concise commit title in {language}}

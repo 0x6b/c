@@ -3,6 +3,7 @@ use std::{process::Command, sync::LazyLock};
 use anyhow::Result;
 use regex::Regex;
 use serde::Deserialize;
+use toml::from_str;
 
 #[derive(Deserialize)]
 struct Config {
@@ -23,7 +24,7 @@ struct Generator {
 }
 
 static CONFIG: LazyLock<Config> = LazyLock::new(|| {
-    toml::from_str(include_str!("../assets/commit-config.toml"))
+    from_str(include_str!("../assets/commit-config.toml"))
         .expect("Failed to parse embedded commit-config.toml")
 });
 
