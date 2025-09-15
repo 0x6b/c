@@ -18,7 +18,7 @@ Format:
 {explanation WHY we made the changes, in bullet list}
 
 Requirements:
-- Use appropriate commit type: build, chore, ci, docs, style, refactor, perf, test
+- Use appropriate commit type: feat, fix, refactor, docs, test, chore, style, perf, build, ci
 - Title: 50 characters or less
 - Body: 70 characters per line maximum
 - Language: {language}
