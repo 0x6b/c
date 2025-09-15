@@ -1,4 +1,4 @@
-# Claude Code Auto Git Commit
+# ccc
 
 A [Claude Code](https://docs.anthropic.com/en/docs/claude-code/) hook that automatically creates a commit whenever changes are made. You can also use this as a standalone commit message generator from git diffs.
 
@@ -37,7 +37,7 @@ Creates one commit per session when you use `/clear` or `/compact`. Also creates
         "hooks": [
           {
             "type": "command",
-            "command": "/path/to/c",
+            "command": "/path/to/ccc",
             "timeout": 10
           }
         ]
@@ -60,7 +60,7 @@ Creates a commit for each edit operation immediately:
         "hooks": [
           {
             "type": "command",
-            "command": "/path/to/c",
+            "command": "/path/to/ccc",
             "timeout": 30
           }
         ]
