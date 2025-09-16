@@ -43,12 +43,20 @@ pub enum HookEvent {
 }
 
 impl HookEvent {
+    /// Gets the current working directory from the hook event
+    ///
+    /// # Returns
+    /// The working directory path as a string slice
     pub fn cwd(&self) -> &str {
         match self {
             HookEvent::SessionStart { cwd, .. } | HookEvent::PostToolUse { cwd, .. } => cwd,
         }
     }
 
+    /// Gets the session ID from the hook event
+    ///
+    /// # Returns
+    /// The session ID as a string slice
     #[allow(dead_code)] // for future use
     pub fn session_id(&self) -> &str {
         match self {
@@ -57,6 +65,10 @@ impl HookEvent {
         }
     }
 
+    /// Gets the transcript path from the hook event
+    ///
+    /// # Returns
+    /// The transcript file path as a string slice
     #[allow(dead_code)] // for future use
     pub fn transcript_path(&self) -> &str {
         match self {
@@ -94,6 +106,7 @@ pub enum SessionStartSource {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[allow(dead_code)] // for future use
 pub enum SessionEndReason {
     Clear,
     Logout,

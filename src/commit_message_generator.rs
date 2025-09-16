@@ -32,6 +32,7 @@ static CONVENTIONAL_COMMIT_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^[a-z]+:\s.+").expect("Failed to compile conventional commit regex")
 });
 
+/// Generates commit messages using AI based on git diff content
 #[derive(Default)]
 pub struct CommitMessageGenerator {
     prompt_template: &'static str,
@@ -41,15 +42,27 @@ pub struct CommitMessageGenerator {
 }
 
 impl CommitMessageGenerator {
-    pub fn new(language: String) -> Result<Self> {
+    /// Creates a new commit message generator for the specified language
+    ///
+    /// # Arguments
+    /// - `language` - The language to use for generating commit messages
+    pub fn new(language: &str) -> Result<Self> {
         Ok(Self {
             prompt_template: &CONFIG.prompt.template,
             command: &CONFIG.generator.command,
             args: &CONFIG.generator.args,
-            language: Box::leak(language.into_boxed_str()),
+            language: Box::leak(Box::new(language.to_string())),
         })
     }
 
+    /// Generates a commit message from the provided diff content
+    ///
+    /// # Arguments
+    /// - `diff_content` - The git diff content to analyze for message generation
+    ///
+    /// # Returns
+    /// A generated commit message string. If generation fails or the result doesn't follow a
+    /// conventional commit format, returns a default commit message.
     pub fn generate(&self, diff_content: &str) -> String {
         self.try_generate(diff_content)
             .map(|message| {

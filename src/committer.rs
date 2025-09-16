@@ -6,21 +6,31 @@ use crate::{
     commit_message_generator::CommitMessageGenerator,
     git_ops::{
         create_commit, create_session_branch, get_current_branch, get_staged_diff,
-        stage_all_changes, stage_file,
+        stage_all_files, stage_file,
     },
     types::{HookEvent, HookEvent::*, Repository, SessionStartSource, ToolName},
 };
 
+/// Handles git commit operations for auto-commit functionality
 pub struct Committer {
     repo: Repository,
 }
 
 impl Committer {
+    /// Creates a new Committer instance with a default repository
     pub fn new() -> Self {
         Self { repo: Repository::default() }
     }
 
-    pub fn handle_event(&self, hook_event: HookEvent, language: String) -> Result<()> {
+    /// Handles different types of hook events and performs appropriate git operations
+    ///
+    /// # Arguments
+    /// * `hook_event` - The hook event to process (SessionStart or PostToolUse)
+    /// * `language` - Language to use for generating commit messages
+    ///
+    /// # Returns
+    /// `Ok(())` on success, or an error if any git operation fails
+    pub fn handle_event(&self, hook_event: HookEvent, language: &str) -> Result<()> {
         match hook_event {
             SessionStart { session_id, source, cwd, .. } => {
                 let current_branch = get_current_branch(&self.repo)?;
@@ -59,16 +69,17 @@ impl Committer {
 
     fn handle_session_end(&self, cwd: &str, language: &str) -> Result<()> {
         set_current_dir(cwd)?;
-        stage_all_changes(&self.repo)?;
-        let diff = get_staged_diff(&self.repo)?;
-        if !diff.is_empty() {
-            let commit_msg = CommitMessageGenerator::new(language.to_string())?.generate(&diff);
-            create_commit(&self.repo, &commit_msg)?;
+        stage_all_files(&self.repo)?;
+        if !get_staged_diff(&self.repo)?.is_empty() {
+            create_commit(
+                &self.repo,
+                &CommitMessageGenerator::new(language)?.generate(&get_staged_diff(&self.repo)?),
+            )?;
         }
         Ok(())
     }
 
-    fn handle_file_commit(&self, cwd: &str, file_path: &str, language: String) -> Result<()> {
+    fn handle_file_commit(&self, cwd: &str, file_path: &str, language: &str) -> Result<()> {
         set_current_dir(cwd)?;
 
         let relative_path = if Path::new(file_path).is_absolute() {
@@ -86,8 +97,7 @@ impl Committer {
             return Ok(());
         }
 
-        let commit_msg = CommitMessageGenerator::new(language)?.generate(&diff);
-        create_commit(&self.repo, &commit_msg)?;
+        create_commit(&self.repo, &CommitMessageGenerator::new(language)?.generate(&diff))?;
 
         Ok(())
     }

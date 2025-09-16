@@ -42,7 +42,7 @@ Creates one commit per session when you use `/clear` or `/compact`. Also creates
           }
         ]
       }
-    ]
+]
   }
 }
 ```
