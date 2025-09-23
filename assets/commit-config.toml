@@ -8,7 +8,7 @@ default_commit_message = "WARNING: commit message generation failure"
 
 [prompt]
 # A prompt template for generating commit messages that will be added after the args above
-# Variables: {language}, {commit type}, {diff_content}
+# Variables to be replaced at run time: {language}, {diff_content}
 template = """
 Generate a Git commit message in {language}, following the Conventional Commits format. OUTPUT ONLY THE COMMIT TITLE AND BODY, NO EXPLANATIONS OR EXTRA TEXT.
 
@@ -19,6 +19,7 @@ Format:
 
 Requirements:
 - Use appropriate commit type: feat, fix, refactor, docs, test, chore, style, perf, build, ci
+- If you have found multiple type of changes, prioritize "feat", "fix", and "refactor" over other type of changes while generating a message
 - Title: 50 characters or less
 - Body: 70 characters per line maximum
 - Language: {language}
