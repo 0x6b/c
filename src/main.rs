@@ -17,6 +17,7 @@ use committer::Committer;
 
 use crate::types::HookEvent;
 
+/// Command line arguments for the auto-commit application
 #[derive(Parser)]
 #[clap(version, about)]
 pub struct Args {
@@ -43,7 +44,7 @@ fn main() -> anyhow::Result<()> {
                 .umask(0o027)
                 .start()
             {
-                Ok(_) => Committer::new().handle_event(hook_event, language),
+                Ok(_) => Committer::new().handle_event(hook_event, &language),
                 Err(e) => {
                     eprintln!("Error starting daemon: {e}");
                     Err(e.into())
@@ -51,7 +52,9 @@ fn main() -> anyhow::Result<()> {
             }
         }
         Err(_) => {
-            println!("{}", CommitMessageGenerator::new(language)?.generate(&input));
+            // If the input is not a valid HookEvent, assume it's a diff content and generate a
+            // commit message from it.
+            println!("{}", CommitMessageGenerator::new(&language)?.generate(&input));
             Ok(())
         }
     }
