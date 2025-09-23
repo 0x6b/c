@@ -123,21 +123,26 @@ fn get_git_config(repo: &Repository) -> Result<(String, String)> {
     let config = gix_repo.config_snapshot();
 
     // Extract username and email
-    let name = config.string("user.name")
+    let name = config
+        .string("user.name")
         .ok_or_else(|| anyhow::anyhow!("user.name not found in config"))
-        .and_then(|n| std::str::from_utf8(&n)
-            .map(|s| s.to_string())
-            .map_err(|e| anyhow::anyhow!("Invalid UTF-8 in user.name: {}", e)))?;
+        .and_then(|n| {
+            std::str::from_utf8(&n)
+                .map(|s| s.to_string())
+                .map_err(|e| anyhow::anyhow!("Invalid UTF-8 in user.name: {}", e))
+        })?;
 
-    let email = config.string("user.email")
+    let email = config
+        .string("user.email")
         .ok_or_else(|| anyhow::anyhow!("user.email not found in config"))
-        .and_then(|e| std::str::from_utf8(&e)
-            .map(|s| s.to_string())
-            .map_err(|e| anyhow::anyhow!("Invalid UTF-8 in user.email: {}", e)))?;
+        .and_then(|e| {
+            std::str::from_utf8(&e)
+                .map(|s| s.to_string())
+                .map_err(|e| anyhow::anyhow!("Invalid UTF-8 in user.email: {}", e))
+        })?;
 
     Ok((name, email))
 }
-
 
 /// Gets the current branch name
 ///
