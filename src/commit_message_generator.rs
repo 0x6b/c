@@ -82,7 +82,7 @@ impl CommitMessageGenerator {
             .replace("{diff_content}", diff_content);
 
         Command::new(self.command)
-            .env("CLAUDE_AUTO_COMMIT_RUNNING", "1")
+            .env("CLAUDE_AUTO_COMMIT_RUNNING", "1") // To prevent recursive calls
             .args(self.args.iter())
             .arg(&prompt)
             .output()

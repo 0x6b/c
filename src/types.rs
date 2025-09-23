@@ -24,17 +24,11 @@ impl Default for Repository {
 pub enum HookEvent {
     SessionStart {
         session_id: String,
-        #[allow(dead_code)] // for future use
-        transcript_path: String,
         cwd: String,
         #[serde(default)]
         source: Option<SessionStartSource>,
     },
     PostToolUse {
-        #[allow(dead_code)] // for future use
-        session_id: String,
-        #[allow(dead_code)] // for future use
-        transcript_path: String,
         cwd: String,
         tool_name: ToolName,
         tool_input: ToolInput,
@@ -50,30 +44,6 @@ impl HookEvent {
     pub fn cwd(&self) -> &str {
         match self {
             HookEvent::SessionStart { cwd, .. } | HookEvent::PostToolUse { cwd, .. } => cwd,
-        }
-    }
-
-    /// Gets the session ID from the hook event
-    ///
-    /// # Returns
-    /// The session ID as a string slice
-    #[allow(dead_code)] // for future use
-    pub fn session_id(&self) -> &str {
-        match self {
-            HookEvent::SessionStart { session_id, .. }
-            | HookEvent::PostToolUse { session_id, .. } => session_id,
-        }
-    }
-
-    /// Gets the transcript path from the hook event
-    ///
-    /// # Returns
-    /// The transcript file path as a string slice
-    #[allow(dead_code)] // for future use
-    pub fn transcript_path(&self) -> &str {
-        match self {
-            HookEvent::SessionStart { transcript_path, .. }
-            | HookEvent::PostToolUse { transcript_path, .. } => transcript_path,
         }
     }
 }
@@ -105,17 +75,6 @@ pub enum SessionStartSource {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "snake_case")]
-#[allow(dead_code)] // for future use
-pub enum SessionEndReason {
-    Clear,
-    Logout,
-    PromptInputExit,
-    Exit,
-    Other,
-}
-
-#[derive(Debug, Deserialize)]
 pub enum ToolName {
     Task,
     Bash,
@@ -127,4 +86,6 @@ pub enum ToolName {
     Write,
     WebFetch,
     WebSearch,
+    #[serde(other)] // fallback
+    Unknown,
 }

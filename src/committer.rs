@@ -5,8 +5,8 @@ use anyhow::Result;
 use crate::{
     commit_message_generator::CommitMessageGenerator,
     git_ops::{
-        create_commit, create_session_branch, get_current_branch, get_staged_diff,
-        stage_all_files, stage_file,
+        create_commit, create_session_branch, get_current_branch, get_staged_diff, stage_all_files,
+        stage_file,
     },
     types::{HookEvent, HookEvent::*, Repository, SessionStartSource, ToolName},
 };
