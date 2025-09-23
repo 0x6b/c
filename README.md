@@ -18,6 +18,21 @@ cargo install --path .
 
 ### As Claude Code Hook
 
+#### Quick Setup
+
+After installing the binary, you can automatically configure the hook for the current repository:
+
+```console
+ccc install
+```
+
+This creates a `SessionStart` hook in `.claude/settings.local.json` that runs the auto-commit tool.
+
+> [!NOTE]
+> The `install` command will not overwrite existing `SessionStart` configurations. It adds a new hook entry to the existing array, preserving any other hooks you may have configured.
+
+#### Manual Configuration
+
 Configure hooks in your [settings files](https://docs.anthropic.com/en/docs/claude-code/settings). You can use either strategy independently or combine both:
 
 - `~/.claude/settings.json` - User settings
@@ -82,9 +97,9 @@ See [Hooks reference](https://docs.anthropic.com/en/docs/claude-code/hooks) for 
 3. Outputs the message to stdout
 
 ```bash
-git diff | c
+git diff | ccc
 # or with staged changes
-git diff --staged | c
+git diff --staged | ccc
 ```
 
 ## Customization
@@ -94,8 +109,8 @@ Edit [`assets/commit-config.toml`](assets/commit-config.toml) and build the bina
 ## Command Line Options
 
 ```console
-$ c --help
-Usage: c [OPTIONS]
+$ ccc --help
+Usage: ccc [OPTIONS]
 
 Options:
   -l, --language <LANGUAGE>  Language to use for commit messages [env: CC_AUTO_COMMIT_LANGUAGE=] [default: Japanese]
