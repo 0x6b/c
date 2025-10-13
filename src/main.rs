@@ -27,7 +27,7 @@ pub struct Args {
     #[command(subcommand)]
     pub command: Option<Commands>,
 
-    /// Language to use for commit messages (for legacy compatibility)
+    /// Language to use for commit messages
     #[arg(short, long, default_value = "Japanese", env = "CC_AUTO_COMMIT_LANGUAGE")]
     pub language: String,
 }
