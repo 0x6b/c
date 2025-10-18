@@ -10,19 +10,56 @@ default_commit_message = "WARNING: commit message generation failure"
 # A prompt template for generating commit messages that will be added after the args above
 # Variables to be replaced at run time: {language}, {diff_content}
 template = """
-Generate a Git commit message in {language}, following the Conventional Commits format. OUTPUT ONLY THE COMMIT TITLE AND BODY, NO EXPLANATIONS OR EXTRA TEXT.
+Generate a Git commit message in {language}, following the Conventional Commits specification. OUTPUT ONLY THE COMMIT MESSAGE, NO EXPLANATIONS OR EXTRA TEXT.
 
-Format:
-{commit type}: {concise commit title in {language}}
+Conventional Commits Format:
+<type>[optional scope]: <description>
 
-{explanation WHY we made the changes, in bullet list}
+[optional body]
 
-Requirements:
-- Use appropriate commit type: feat, fix, refactor, docs, test, chore, style, perf, build, ci
-- If you have found multiple type of changes, prioritize "feat", "fix", and "refactor" over other type of changes while generating a message
-- Title: 50 characters or less
-- Body: 70 characters per line maximum
+[optional footer(s)]
+
+Types: feat, fix, refactor, docs, test, chore, style, perf, build, ci
+- feat: new feature
+- fix: bug fix
+- refactor: code restructuring without changing behavior
+- docs: documentation changes
+- test: adding or fixing tests
+- chore: maintenance tasks
+- style: code style/formatting changes
+- perf: performance improvements
+- build: build system changes
+- ci: CI/CD changes
+
+Guidelines:
+- Title: 50 characters max, imperative mood ("Add feature" not "Added feature")
+- Include scope in parentheses if changes are limited to a specific component (e.g., "feat(auth): add login validation")
+- Add "!" after type/scope for breaking changes (e.g., "feat!: change API signature")
+- Include body only if explanation adds value beyond the title
+- Body: 72 characters per line max, explain WHAT and WHY (not how)
+- Use bullet points for multiple changes or breaking changes
+- For breaking changes, explain migration path in footer with "BREAKING CHANGE:" prefix
+- Prioritize: breaking changes > feat > fix > refactor > others
+- If multiple types, choose the most significant one
 - Language: {language}
+
+Examples:
+feat: add user authentication system
+- Implement JWT token validation
+- Add password hashing with bcrypt
+
+fix(ui): resolve modal close button overlap
+- Adjust z-index for close button positioning
+
+refactor(api): extract validation logic to middleware
+- Move input validation to reusable middleware
+- Reduce code duplication in route handlers
+
+feat!: migrate to new database schema
+- Update all models to use new schema
+- Add migration scripts
+
+BREAKING CHANGE: API endpoints now require authentication
 
 Diff:
 {diff_content}
