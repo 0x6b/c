@@ -95,8 +95,13 @@ fn install_hook(language: &str) -> Result<()> {
         .unwrap_or_else(|| json!({}));
     let settings = settings.as_object_mut().unwrap();
 
+    let binary_path = current_exe()?.display().to_string();
+
     // Create the new hook entry
-    settings
+    let new_hook = json!({ "hooks": [ { "type": "command", "command": format!("{binary_path} --language {language}"), "timeout": 10 } ] });
+
+    // Check if there's already a hook for this binary
+    let session_start_array = settings
         .entry("hooks".to_string())
         .or_insert_with(|| json!({}))
         .as_object_mut()
@@ -104,20 +109,53 @@ fn install_hook(language: &str) -> Result<()> {
         .entry("SessionStart".to_string())
         .or_insert_with(|| json!([]))
         .as_array_mut()
-        .unwrap()
-        .push(json!({
-            "hooks": [
-                {
-                    "type": "command",
-                    "command": format!("{} --language {language}", current_exe()?.display()),
-                    "timeout": 10
-                }
-            ]
-        }));
+        .unwrap();
+
+    // Look for existing hook with the same binary path
+    let mut existing_hook_index = None;
+    for (i, existing_hook) in session_start_array.iter().enumerate() {
+        if let Some(hooks_array) = existing_hook.get("hooks")
+            && let Some(hooks) = hooks_array.as_array()
+            && let Some(first_hook) = hooks.first()
+            && let Some(command) = first_hook.get("command")
+            && let Some(command_str) = command.as_str()
+            && command_str.starts_with(&binary_path)
+        {
+            existing_hook_index = Some(i);
+            break;
+        }
+    }
+
+    if let Some(index) = existing_hook_index {
+        // Check if the language is already correct
+        let existing_command = session_start_array[index]
+            .get("hooks")
+            .and_then(|h| h.as_array())
+            .and_then(|h| h.first())
+            .and_then(|h| h.get("command"))
+            .and_then(|c| c.as_str())
+            .unwrap_or("");
+        let expected_command = format!("{binary_path} --language {language}");
+
+        if existing_command == expected_command {
+            println!("Hook configuration already exists in {}", settings_path.display());
+        } else {
+            // Update the existing hook with the new language
+            if let Some(hooks_array) = session_start_array[index].get_mut("hooks")
+                && let Some(hooks) = hooks_array.as_array_mut()
+                && let Some(first_hook) = hooks.first_mut()
+            {
+                first_hook["command"] = json!(expected_command);
+            }
+            println!("Hook configuration updated in {}", settings_path.display());
+        }
+    } else {
+        // Add new hook
+        session_start_array.push(new_hook);
+        println!("Hook installed successfully to {}", settings_path.display());
+    }
 
     File::create(&settings_path)?.write_all(to_string_pretty(&settings)?.as_bytes())?;
-
-    println!("Hook installed successfully to {}", settings_path.display());
 
     Ok(())
 }

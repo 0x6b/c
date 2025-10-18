@@ -44,7 +44,7 @@ impl Committer {
                             | SessionStartSource::Resume
                     )
                 {
-                    self.handle_session_end(&cwd, &language)?;
+                    self.handle_session_end(&cwd, language)?;
                 }
 
                 // Then handle new session creation

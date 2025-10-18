@@ -29,7 +29,7 @@ ccc install
 This creates a `SessionStart` hook in `.claude/settings.local.json` that runs the auto-commit tool.
 
 > [!NOTE]
-> The `install` command will not overwrite existing `SessionStart` configurations. It adds a new hook entry to the existing array, preserving any other hooks you may have configured.
+> The `install` command will not add duplicate hooks for the same binary. If a hook already exists for the current binary, it will update the language parameter if different. This ensures only one hook per binary while allowing language changes.
 
 #### Manual Configuration
 
