@@ -1,66 +1,16 @@
 [generator]
 # Claude CLI configuration for commit message generation
 command = "claude"
-# Claude CLI arguments
-args = ["--model", "sonnet", "--print"]
+# Claude CLI arguments - using headless mode with subagent
+args = ["-p", "--output-format", "text", "--agents", "{\"commit-writer\":{\"description\":\"Specialized agent for generating Conventional Commits from git diffs. Use proactively for commit message generation.\",\"prompt\":\"You are a commit message specialist. Generate concise, conventional commit messages that follow best practices.\\n\\nIMPORTANT: Always generate commit messages in the language specified by the user. If no language is specified, default to English.\\n\\nConventional Commits Format:\\n<type>[optional scope]: <description>\\n\\n[optional body]\\n\\n[optional footer(s)]\\n\\nTypes: feat, fix, refactor, docs, test, chore, style, perf, build, ci\\n- feat: new feature\\n- fix: bug fix\\n- refactor: code restructuring without changing behavior\\n- docs: documentation changes\\n- test: adding or fixing tests\\n- chore: maintenance tasks\\n- style: code style/formatting changes\\n- perf: performance improvements\\n- build: build system changes\\n- ci: CI/CD changes\\n\\nGuidelines:\\n- Title: 50 characters max, imperative mood (\\\"Add feature\\\" not \\\"Added feature\\\")\\n- Include scope in parentheses if changes are limited to a specific component (e.g., \\\"feat(auth): add login validation\\\")\\n- Add \\\"!\\\" after type/scope for breaking changes (e.g., \\\"feat!: change API signature\\\")\\n- Include body only if explanation adds value beyond the title\\n- Body: 72 characters per line max, explain WHAT and WHY (not how)\\n- Use bullet points for multiple changes or breaking changes\\n- For breaking changes, explain migration path in footer with \\\"BREAKING CHANGE:\\\" prefix\\n- Prioritize: breaking changes > feat > fix > refactor > others\\n- If multiple types, choose the most significant one\\n- OUTPUT ONLY THE COMMIT MESSAGE, NO EXPLANATIONS OR EXTRA TEXT\",\"tools\":\"Read,Grep\",\"model\":\"inherit\"}}"]
 # Fallback message if generation fails
 default_commit_message = "WARNING: commit message generation failure"
 
 [prompt]
-# A prompt template for generating commit messages that will be added after the args above
+# A prompt template for generating commit messages using the commit-writer subagent
 # Variables to be replaced at run time: {language}, {diff_content}
 template = """
-Generate a Git commit message in {language}, following the Conventional Commits specification. OUTPUT ONLY THE COMMIT MESSAGE, NO EXPLANATIONS OR EXTRA TEXT.
+Generate a commit message in {language} for these changes:
 
-Conventional Commits Format:
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-
-Types: feat, fix, refactor, docs, test, chore, style, perf, build, ci
-- feat: new feature
-- fix: bug fix
-- refactor: code restructuring without changing behavior
-- docs: documentation changes
-- test: adding or fixing tests
-- chore: maintenance tasks
-- style: code style/formatting changes
-- perf: performance improvements
-- build: build system changes
-- ci: CI/CD changes
-
-Guidelines:
-- Title: 50 characters max, imperative mood ("Add feature" not "Added feature")
-- Include scope in parentheses if changes are limited to a specific component (e.g., "feat(auth): add login validation")
-- Add "!" after type/scope for breaking changes (e.g., "feat!: change API signature")
-- Include body only if explanation adds value beyond the title
-- Body: 72 characters per line max, explain WHAT and WHY (not how)
-- Use bullet points for multiple changes or breaking changes
-- For breaking changes, explain migration path in footer with "BREAKING CHANGE:" prefix
-- Prioritize: breaking changes > feat > fix > refactor > others
-- If multiple types, choose the most significant one
-- Language: {language}
-
-Examples:
-feat: add user authentication system
-- Implement JWT token validation
-- Add password hashing with bcrypt
-
-fix(ui): resolve modal close button overlap
-- Adjust z-index for close button positioning
-
-refactor(api): extract validation logic to middleware
-- Move input validation to reusable middleware
-- Reduce code duplication in route handlers
-
-feat!: migrate to new database schema
-- Update all models to use new schema
-- Add migration scripts
-
-BREAKING CHANGE: API endpoints now require authentication
-
-Diff:
 {diff_content}
 """
