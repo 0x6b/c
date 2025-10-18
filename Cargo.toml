@@ -1,6 +1,6 @@
 [package]
 name = "ccc"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2024"
 description = "A Claude Code hook that automatically creates a commit whenever changes are made. You can also use this as a standalone commit message generator from git diffs."
 
